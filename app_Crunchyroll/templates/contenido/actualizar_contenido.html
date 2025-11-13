@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="bi bi-pencil"></i> Actualizar Contenido</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="bi bi-info-circle me-2 fs-5"></i>
+                    <div>
+                        <strong>Editando:</strong> {{ contenido.titulo }} (ID: {{ contenido.id }})
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Información Básica -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-info-circle"></i> Información Básica
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Título del Contenido:</label>
+                                    <input type="text" name="titulo" class="form-control" 
+                                           value="{{ contenido.titulo }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo:</label>
+                                    <select name="tipo" class="form-select" required>
+                                        <option value="anime" {% if contenido.tipo == 'anime' %}selected{% endif %}>🎌 Anime</option>
+                                        <option value="pelicula" {% if contenido.tipo == 'pelicula' %}selected{% endif %}>🎬 Película</option>
+                                        <option value="manga" {% if contenido.tipo == 'manga' %}selected{% endif %}>📚 Manga</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles del Contenido -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-calendar"></i> Detalles del Contenido
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha de Lanzamiento:</label>
+                                    <input type="date" name="fecha_lanzamiento" class="form-control" 
+                                           value="{{ contenido.fecha_lanzamiento|date:'Y-m-d' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Categoría:</label>
+                                    <select name="categoria" class="form-select" required>
+                                        <option value="1" {% if contenido.categoria == 1 %}selected{% endif %}>Shonen</option>
+                                        <option value="2" {% if contenido.categoria == 2 %}selected{% endif %}>Shojo</option>
+                                        <option value="3" {% if contenido.categoria == 3 %}selected{% endif %}>Seinen</option>
+                                        <option value="4" {% if contenido.categoria == 4 %}selected{% endif %}>Josei</option>
+                                        <option value="5" {% if contenido.categoria == 5 %}selected{% endif %}>Kodomo</option>
+                                        <option value="6" {% if contenido.categoria == 6 %}selected{% endif %}>Mecha</option>
+                                        <option value="7" {% if contenido.categoria == 7 %}selected{% endif %}>Isekai</option>
+                                        <option value="8" {% if contenido.categoria == 8 %}selected{% endif %}>Fantasia</option>
+                                        <option value="9" {% if contenido.categoria == 9 %}selected{% endif %}>Ciencia Ficción</option>
+                                        <option value="10" {% if contenido.categoria == 10 %}selected{% endif %}>Romance</option>
+                                        <option value="11" {% if contenido.categoria == 11 %}selected{% endif %}>Comedia</option>
+                                        <option value="12" {% if contenido.categoria == 12 %}selected{% endif %}>Terror</option>
+                                        <option value="13" {% if contenido.categoria == 13 %}selected{% endif %}>Drama</option>
+                                        <option value="14" {% if contenido.categoria == 14 %}selected{% endif %}>Aventura</option>
+                                        <option value="15" {% if contenido.categoria == 15 %}selected{% endif %}>Acción</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Capítulos/Volúmenes:</label>
+                                    <input type="text" name="capitulos" class="form-control" 
+                                           value="{{ contenido.capitulos }}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suscripción -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-credit-card"></i> Suscripción
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label">Plan de Suscripción:</label>
+                            <select name="suscripcion" class="form-select" required>
+                                {% for suscripcion in suscripciones %}
+                                <option value="{{ suscripcion.id }}" 
+                                        {% if suscripcion.id == contenido.suscripcion.id %}selected{% endif %}>
+                                    {{ suscripcion.nombre_plan }} - ${{ suscripcion.precio }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Actualizar Contenido
+                        </button>
+                        <a href="{% url 'ver_contenido' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

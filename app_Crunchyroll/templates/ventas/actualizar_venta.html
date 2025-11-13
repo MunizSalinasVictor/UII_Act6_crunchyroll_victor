@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="bi bi-cart-dash"></i> Actualizar Venta</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="bi bi-info-circle me-2 fs-5"></i>
+                    <div>
+                        <strong>Editando:</strong> {{ venta.codigo_transaccion }} (ID: {{ venta.id }})
+                    </div>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Información de la Transacción -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-credit-card"></i> Información de la Transacción
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Monto de la Venta:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" name="monto" class="form-control" 
+                                               value="{{ venta.monto }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Código de Transacción:</label>
+                                    <input type="text" name="codigo_transaccion" class="form-control" 
+                                           value="{{ venta.codigo_transaccion }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Método de Pago:</label>
+                                    <select name="metodo_pago" class="form-select" required>
+                                        <option value="tarjeta" {% if venta.metodo_pago == 'tarjeta' %}selected{% endif %}>Tarjeta de Crédito/Débito</option>
+                                        <option value="paypal" {% if venta.metodo_pago == 'paypal' %}selected{% endif %}>PayPal</option>
+                                        <option value="transferencia" {% if venta.metodo_pago == 'transferencia' %}selected{% endif %}>Transferencia Bancaria</option>
+                                        <option value="crypto" {% if venta.metodo_pago == 'crypto' %}selected{% endif %}>Criptomoneda</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Estado de la Venta:</label>
+                                    <select name="estado" class="form-select" required>
+                                        <option value="completada" {% if venta.estado == 'completada' %}selected{% endif %}>Completada</option>
+                                        <option value="pendiente" {% if venta.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                        <option value="cancelada" {% if venta.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                        <option value="reembolsada" {% if venta.estado == 'reembolsada' %}selected{% endif %}>Reembolsada</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Relaciones -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-diagram-3"></i> Información de Relaciones
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Usuario:</label>
+                                    <select name="usuario" class="form-select" required>
+                                        {% for usuario in usuarios %}
+                                        <option value="{{ usuario.id }}" 
+                                                {% if usuario.id == venta.usuario.id %}selected{% endif %}>
+                                            {{ usuario.nombre_usuario }} - {{ usuario.email }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Suscripción:</label>
+                                    <select name="suscripcion" class="form-select" required>
+                                        {% for suscripcion in suscripciones %}
+                                        <option value="{{ suscripcion.id }}" 
+                                                {% if suscripcion.id == venta.suscripcion.id %}selected{% endif %}>
+                                            {{ suscripcion.nombre_plan }} - ${{ suscripcion.precio }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Empleado (Opcional):</label>
+                                    <select name="empleado" class="form-select">
+                                        <option value="">Sin empleado asignado</option>
+                                        {% for empleado in empleados %}
+                                        <option value="{{ empleado.id }}" 
+                                                {% if venta.empleado and empleado.id == venta.empleado.id %}selected{% endif %}>
+                                            {{ empleado.nombre }} {{ empleado.apellido }} - {{ empleado.departamento }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Actualizar Venta
+                        </button>
+                        <a href="{% url 'ver_ventas' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información actual de la venta -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-eye"></i> Vista Previa de la Venta</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Información de Transacción</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>ID:</strong> {{ venta.id }}</li>
+                            <li><strong>Código:</strong> {{ venta.codigo_transaccion }}</li>
+                            <li><strong>Monto:</strong> ${{ venta.monto }}</li>
+                            <li><strong>Método Pago:</strong> {{ venta.get_metodo_pago_display }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Información de Relaciones</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Usuario:</strong> {{ venta.usuario.nombre_usuario }}</li>
+                            <li><strong>Suscripción:</strong> {{ venta.suscripcion.nombre_plan }}</li>
+                            <li><strong>Empleado:</strong> 
+                                {% if venta.empleado %}
+                                    {{ venta.empleado.nombre }} {{ venta.empleado.apellido }}
+                                {% else %}
+                                    No asignado
+                                {% endif %}
+                            </li>
+                            <li><strong>Fecha:</strong> {{ venta.fecha_venta }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

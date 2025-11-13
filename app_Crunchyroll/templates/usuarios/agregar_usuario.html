@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4><i class="bi bi-person-plus"></i> Agregar Nuevo Usuario</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Información de Cuenta -->
+                    <div class="mb-4">
+                        <h5 class="text-info border-bottom pb-2">
+                            <i class="bi bi-person-badge"></i> Información de Cuenta
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre de Usuario:</label>
+                                    <input type="text" name="nombre_usuario" class="form-control" placeholder="Ej: akira_fan" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email:</label>
+                                    <input type="email" name="email" class="form-control" placeholder="usuario@email.com" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña:</label>
+                            <input type="password" name="password" class="form-control" placeholder="Ingrese la contraseña" required>
+                        </div>
+                    </div>
+
+
+                    <!-- Suscripción y Estado -->
+                    <div class="mb-4">
+                        <h5 class="text-info border-bottom pb-2">
+                            <i class="bi bi-credit-card"></i> Suscripción y Estado
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Plan de Suscripción:</label>
+                                    <select name="suscripcion" class="form-select" required>
+                                        <option value="">Seleccionar suscripción...</option>
+                                        {% for suscripcion in suscripciones %}
+                                        <option value="{{ suscripcion.id }}">{{ suscripcion.nombre_plan }} - ${{ suscripcion.precio }}/mes</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Estado:</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" name="activo" id="activo" checked>
+                                        <label class="form-check-label" for="activo">
+                                            <strong>Usuario Activo</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            <i class="bi bi-check-circle"></i> Guardar Usuario
+                        </button>
+                        <a href="{% url 'ver_usuarios' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.querySelector('input[type="file"]');
+    const preview = document.getElementById('preview');
+    const imagePreview = document.getElementById('imagePreview');
+
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                imagePreview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.classList.add('d-none');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-warning">
+                    <h5>¿Estás seguro de que deseas eliminar este contenido?</h5>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{{ contenido.titulo }}</h5>
+                        <p class="card-text">
+                            <strong>Tipo: </strong> <td>{{ contenido.tipo }}</td>
+                            </span><br>
+                            <strong>Fecha Lanzamiento:</strong> {{ contenido.fecha_lanzamiento }}<br>
+                            <strong>Categoría:</strong> {{ contenido.categoria }}<br>
+                            <strong>Capítulos:</strong> {{ contenido.capitulos }}<br>
+                            <strong>Suscripción:</strong> {{ contenido.suscripcion.nombre_plan }}
+                        </p>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <i class="bi bi-trash"></i> Sí, Eliminar Contenido
+                    </button>
+                    <a href="{% url 'ver_contenido' %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

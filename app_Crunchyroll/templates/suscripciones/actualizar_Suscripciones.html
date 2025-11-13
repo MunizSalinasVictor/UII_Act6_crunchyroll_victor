@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="bi bi-pencil-square"></i> Actualizar Suscripción</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="bi bi-info-circle me-2 fs-5"></i>
+                    <div>
+                        <strong>Editando:</strong> {{ suscripcion.nombre_plan }} (ID: {{ suscripcion.id }})
+                    </div>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Información Básica -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-info-circle"></i> Información Básica
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre del Plan:</label>
+                                    <input type="text" name="nombre_plan" class="form-control" 
+                                           value="{{ suscripcion.nombre_plan }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Precio:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" name="precio" class="form-control" 
+                                               value="{{ suscripcion.precio }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Características -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-gear"></i> Características
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Calidad de Video:</label>
+                                    <select name="calidad_video" class="form-select" required>
+                                        <option value="480p" {% if suscripcion.calidad_video == '480p' %}selected{% endif %}>480p SD</option>
+                                        <option value="720p" {% if suscripcion.calidad_video == '720p' %}selected{% endif %}>720p HD</option>
+                                        <option value="1080p" {% if suscripcion.calidad_video == '1080p' %}selected{% endif %}>1080p Full HD</option>
+                                        <option value="4K" {% if suscripcion.calidad_video == '4K' %}selected{% endif %}>4K Ultra HD</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Número de Dispositivos:</label>
+                                    <input type="number" name="num_dispositivos" class="form-control" 
+                                           value="{{ suscripcion.num_dispositivos }}" min="1" max="10" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Beneficios Extra:</label>
+                            <textarea name="beneficio_extra" class="form-control" rows="3">{{ suscripcion.beneficio_extra }}</textarea>
+                        </div>
+
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="descarga_offline" id="descarga_offline"
+                                   {% if suscripcion.descarga_offline %}checked{% endif %}>
+                            <label class="form-check-label" for="descarga_offline">
+                                <strong>Descarga Offline Disponible</strong>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Empresa -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-building"></i> Empresa
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label">Empresa:</label>
+                            <select name="empresa" class="form-select" required>
+                                {% for empresa in empresas %}
+                                <option value="{{ empresa.id }}" 
+                                        {% if empresa.id == suscripcion.empresa.id %}selected{% endif %}>
+                                    {{ empresa.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Actualizar Suscripción
+                        </button>
+                        <a href="{% url 'ver_Suscripciones' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información actual -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-eye"></i> Vista Previa de la Suscripción</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Información General</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>ID:</strong> {{ suscripcion.id }}</li>
+                            <li><strong>Plan:</strong> {{ suscripcion.nombre_plan }}</li>
+                            <li><strong>Precio:</strong> ${{ suscripcion.precio }}</li>
+                            <li><strong>Calidad:</strong> {{ suscripcion.calidad_video }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Características</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Dispositivos:</strong> {{ suscripcion.num_dispositivos }}</li>
+                            <li><strong>Descarga Offline:</strong> 
+                                {% if suscripcion.descarga_offline %}
+                                    <span class="badge bg-success">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Empresa:</strong> {{ suscripcion.empresa.nombre }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

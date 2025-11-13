@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-people"></i> Lista de Empleados</h4>
+        <span class="badge bg-light text-dark fs-6">{{ empleados.count }} empleado(s)</span>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{% url 'agregar_empleado' %}" class="btn btn-success">
+                <i class="bi bi-person-plus"></i> Agregar Nuevo Empleado
+            </a>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" class="form-control" placeholder="Buscar empleado..." id="searchInput">
+                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        {% if empleados %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="empleadosTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Empleado</th>
+                        <th>Contacto</th>
+                        <th>Departamento</th>
+                        <th>Salario</th>
+                        <th>Empresa</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empleado in empleados %}
+                    <tr>
+                        <td><strong>#{{ empleado.id }}</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <strong class="d-block">{{ empleado.nombre }} {{ empleado.apellido }}</strong>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> {{ empleado.fecha_contratacion }}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <i class="bi bi-envelope text-primary"></i> {{ empleado.email }}<br>
+                                <i class="bi bi-telephone text-success"></i> {{ empleado.telefono }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if empleado.departamento == 'soporte' %}
+                                <span class="badge bg-primary">
+                                    <i class="bi bi-headset"></i> Soporte
+                                </span>
+                            {% elif empleado.departamento == 'tecnico' %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-tools"></i> Técnico
+                                </span>
+                            {% elif empleado.departamento == 'contenido' %}
+                                <span class="badge bg-info">
+                                    <i class="bi bi-collection-play"></i> Contenido
+                                </span>
+                            {% elif empleado.departamento == 'marketing' %}
+                                <span class="badge bg-purple" style="background-color: #6f42c1;">
+                                    <i class="bi bi-megaphone"></i> Marketing
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-briefcase"></i> Administración
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong class="text-success">${{ empleado.salario }}</strong><br>
+                            <small class="text-muted">Anual</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if empleado.empresa.foto %}
+                                    <img src="{{ empleado.empresa.foto.url }}" class="rounded me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                {% else %}
+                                    <i class="bi bi-building text-muted me-2"></i>
+                                {% endif %}
+                                <span>{{ empleado.empresa.nombre }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if empleado.activo %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Activo
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <a href="{% url 'actualizar_empleado' empleado.id %}" class="btn btn-warning mb-1">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a href="{% url 'borrar_empleado' empleado.id %}" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ empleados.count }}</h4>
+                                <p>Total Empleados</p>
+                            </div>
+                            <i class="bi bi-people fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ empleados_activos }}</h4>
+                                <p>Empleados Activos</p>
+                            </div>
+                            <i class="bi bi-person-check fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ empresas_count }}</h4>
+                                <p>Empresas</p>
+                            </div>
+                            <i class="bi bi-building fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>${{ salario_promedio }}</h4>
+                                <p>Salario Promedio</p>
+                            </div>
+                            <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-people display-1 text-muted"></i>
+            </div>
+            <h3 class="text-muted">No hay empleados registrados</h3>
+            <p class="text-muted mb-4">Comienza agregando el primer empleado al sistema.</p>
+            <a href="{% url 'agregar_empleado' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-person-plus"></i> Agregar Primer Empleado
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const table = document.getElementById('empleadosTable');
+    
+    if (table) {
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        function filterTable() {
+            const filter = searchInput.value.toLowerCase();
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(filter)) {
+                        found = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+        
+        searchInput.addEventListener('keyup', filterTable);
+        searchButton.addEventListener('click', filterTable);
+    }
+});
+</script>
+
+<style>
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+</style>
+{% endblock %}

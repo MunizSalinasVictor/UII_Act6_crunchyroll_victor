@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="bi bi-person-gear"></i> Actualizar Empleado</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="bi bi-info-circle me-2 fs-5"></i>
+                    <div>
+                        <strong>Editando:</strong> {{ empleado.nombre }} {{ empleado.apellido }} (ID: {{ empleado.id }})
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Información Personal -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-person-badge"></i> Información Personal
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre:</label>
+                                    <input type="text" name="nombre" class="form-control" 
+                                           value="{{ empleado.nombre }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Apellido:</label>
+                                    <input type="text" name="apellido" class="form-control" 
+                                           value="{{ empleado.apellido }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email:</label>
+                                    <input type="email" name="email" class="form-control" 
+                                           value="{{ empleado.email }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Teléfono:</label>
+                                    <input type="text" name="telefono" class="form-control" 
+                                           value="{{ empleado.telefono }}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Laboral -->
+                    <div class="mb-4">
+                        <h5 class="text-warning border-bottom pb-2">
+                            <i class="bi bi-briefcase"></i> Información Laboral
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha de Contratación:</label>
+                                    <input type="date" name="fecha_contratacion" class="form-control" 
+                                           value="{{ empleado.fecha_contratacion|date:'Y-m-d' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Salario:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" name="salario" class="form-control" 
+                                               value="{{ empleado.salario }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Departamento:</label>
+                                    <select name="departamento" class="form-select" required>
+                                        <option value="soporte" {% if empleado.departamento == 'soporte' %}selected{% endif %}>Soporte al Cliente</option>
+                                        <option value="tecnico" {% if empleado.departamento == 'tecnico' %}selected{% endif %}>Técnico</option>
+                                        <option value="contenido" {% if empleado.departamento == 'contenido' %}selected{% endif %}>Gestión de Contenido</option>
+                                        <option value="marketing" {% if empleado.departamento == 'marketing' %}selected{% endif %}>Marketing</option>
+                                        <option value="administracion" {% if empleado.departamento == 'administracion' %}selected{% endif %}>Administración</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Empresa:</label>
+                                    <select name="empresa" class="form-select" required>
+                                        {% for empresa in empresas %}
+                                        <option value="{{ empresa.id }}" 
+                                                {% if empresa.id == empleado.empresa.id %}selected{% endif %}>
+                                            {{ empresa.nombre }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado del Empleado -->
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="activo" id="activo"
+                                   {% if empleado.activo %}checked{% endif %}>
+                            <label class="form-check-label" for="activo">
+                                <strong>Empleado Activo</strong>
+                            </label>
+                        </div>
+                        <div class="form-text">Desactive si el empleado ya no trabaja en la empresa</div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Actualizar Empleado
+                        </button>
+                        <a href="{% url 'ver_empleados' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información actual del empleado -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-eye"></i> Vista Previa del Empleado</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Información Personal</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>ID:</strong> {{ empleado.id }}</li>
+                            <li><strong>Nombre:</strong> {{ empleado.nombre }} {{ empleado.apellido }}</li>
+                            <li><strong>Email:</strong> {{ empleado.email }}</li>
+                            <li><strong>Teléfono:</strong> {{ empleado.telefono }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Información Laboral</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Empresa:</strong> {{ empleado.empresa.nombre }}</li>
+                            <li><strong>Departamento:</strong> {{ empleado.get_departamento_display }}</li>
+                            <li><strong>Contratación:</strong> {{ empleado.fecha_contratacion }}</li>
+                            <li><strong>Salario:</strong> ${{ empleado.salario }}</li>
+                            <li><strong>Estado:</strong> 
+                                {% if empleado.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

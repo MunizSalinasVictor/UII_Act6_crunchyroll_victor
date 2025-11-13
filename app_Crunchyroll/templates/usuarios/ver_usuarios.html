@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-people"></i> Lista de Usuarios</h4>
+        <span class="badge bg-light text-dark fs-6">{{ usuarios.count }} usuario(s)</span>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{% url 'agregar_usuario' %}" class="btn btn-info">
+                <i class="bi bi-person-plus"></i> Agregar Nuevo Usuario
+            </a>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" class="form-control" placeholder="Buscar usuario..." id="searchInput">
+                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        {% if usuarios %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="usuariosTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Registro</th>
+                        <th>Estado</th>
+                        <th>Suscripción</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td><strong>#{{ usuario.id }}</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <strong class="d-block">{{ usuario.nombre_usuario }}</strong>
+                                    <small class="text-muted">
+                                        Registrado: {{ usuario.fecha_registro }}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-envelope text-muted me-2"></i>
+                                <span>{{ usuario.email }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ usuario.fecha_registro }}</span>
+                        </td>
+                        <td>
+                            {% if usuario.activo %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Activo
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-credit-card text-muted me-2"></i>
+                                <span>{{ usuario.suscripcion.nombre_plan }}</span>
+                            </div>
+                            <small class="text-muted">${{ usuario.suscripcion.precio }}/mes</small>
+                        </td>
+                        <td>
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <a href="{% url 'actualizar_usuario' usuario.id %}" class="btn btn-warning mb-1">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a href="{% url 'borrar_usuario' usuario.id %}" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ usuarios.count }}</h4>
+                                <p>Total Usuarios</p>
+                            </div>
+                            <i class="bi bi-people fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ usuarios_activos }}</h4>
+                                <p>Usuarios Activos</p>
+                            </div>
+                            <i class="bi bi-person-check fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ usuarios_inactivos }}</h4>
+                                <p>Usuarios Inactivos</p>
+                            </div>
+                            <i class="bi bi-person-x fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ suscripciones_count }}</h4>
+                                <p>Planes Activos</p>
+                            </div>
+                            <i class="bi bi-credit-card fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-people display-1 text-muted"></i>
+            </div>
+            <h3 class="text-muted">No hay usuarios registrados</h3>
+            <p class="text-muted mb-4">Comienza agregando el primer usuario al sistema.</p>
+            <a href="{% url 'agregar_usuario' %}" class="btn btn-info btn-lg">
+                <i class="bi bi-person-plus"></i> Agregar Primer Usuario
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const table = document.getElementById('usuariosTable');
+    
+    if (table) {
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        function filterTable() {
+            const filter = searchInput.value.toLowerCase();
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(filter)) {
+                        found = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+        
+        searchInput.addEventListener('keyup', filterTable);
+        searchButton.addEventListener('click', filterTable);
+    }
+});
+</script>
+{% endblock %}

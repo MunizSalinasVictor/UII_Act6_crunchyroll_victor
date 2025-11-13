@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="bi bi-plus-circle"></i> Agregar Nueva Suscripción</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Información Básica -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2">
+                            <i class="bi bi-info-circle"></i> Información Básica
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre del Plan:</label>
+                                    <input type="text" name="nombre_plan" class="form-control" placeholder="Ej: Plan Premium" required>
+                                    <div class="form-text">Nombre único para identificar el plan</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Precio:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" name="precio" class="form-control" placeholder="0.00" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Características -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2">
+                            <i class="bi bi-gear"></i> Características
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Calidad de Video:</label>
+                                    <select name="calidad_video" class="form-select" required>
+                                        <option value="">Seleccionar calidad...</option>
+                                        <option value="480p">480p SD</option>
+                                        <option value="720p">720p HD</option>
+                                        <option value="1080p">1080p Full HD</option>
+                                        <option value="4K">4K Ultra HD</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Número de Dispositivos:</label>
+                                    <input type="number" name="num_dispositivos" class="form-control" min="1" max="10" required>
+                                    <div class="form-text">Número máximo de dispositivos simultáneos</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Beneficios Extra:</label>
+                            <textarea name="beneficio_extra" class="form-control" rows="3" placeholder="Describa los beneficios adicionales del plan..."></textarea>
+                        </div>
+
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="descarga_offline" id="descarga_offline">
+                            <label class="form-check-label" for="descarga_offline">
+                                <strong>Descarga Offline Disponible</strong>
+                            </label>
+                            <div class="form-text">Permitir descarga de contenido para ver sin conexión</div>
+                        </div>
+                    </div>
+
+                    <!-- Empresa -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2">
+                            <i class="bi bi-building"></i> Empresa
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label">Empresa:</label>
+                            <select name="empresa" class="form-select" required>
+                                <option value="">Seleccionar empresa...</option>
+                                {% for empresa in empresas %}
+                                <option value="{{ empresa.id }}">{{ empresa.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Empresa a la que pertenece esta suscripción</div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> Guardar Suscripción
+                        </button>
+                        <a href="{% url 'ver_Suscripciones' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información de Calidades -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-info-circle text-primary"></i> Información de Calidades</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6>480p SD</h6>
+                        <p class="small text-muted">Calidad estándar - 854x480px</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>720p HD</h6>
+                        <p class="small text-muted">Alta definición - 1280x720px</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>1080p Full HD</h6>
+                        <p class="small text-muted">Full alta definición - 1920x1080px</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>4K Ultra HD</h6>
+                        <p class="small text-muted">Ultra alta definición - 3840x2160px</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

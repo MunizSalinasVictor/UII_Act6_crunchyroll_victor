@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-collection-play"></i> Lista de Contenido</h4>
+        <span class="badge bg-light text-dark fs-6">{{ contenidos.count }} contenido(s)</span>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{% url 'agregar_contenido' %}" class="btn btn-success">
+                <i class="bi bi-plus-square"></i> Agregar Nuevo Contenido
+            </a>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" class="form-control" placeholder="Buscar contenido..." id="searchInput">
+                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        {% if contenidos %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="contenidosTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Contenido</th>
+                        <th>Tipo</th>
+                        <th>Lanzamiento</th>
+                        <th>Categoría</th>
+                        <th>Capítulos/Vol.</th>
+                        <th>Suscripción</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contenido in contenidos %}
+                    <tr>
+                        <td><strong>#{{ contenido.id }}</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <strong class="d-block">{{ contenido.titulo }}</strong>
+                                    <small class="text-muted">
+                                        {{ contenido.suscripcion.nombre_plan }}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if contenido.tipo == 'anime' %}
+                                <span class="badge bg-primary">
+                                    <i class="bi bi-tv"></i> Anime
+                                </span>
+                            {% elif contenido.tipo == 'pelicula' %}
+                                <span class="badge bg-info">
+                                    <i class="bi bi-film"></i> Película
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-book"></i> Manga
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ contenido.fecha_lanzamiento }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-dark">{{ contenido.get_categoria_display }}</span>
+                        </td>
+                        <td>
+                            {% if contenido.tipo == 'anime' %}
+                                <span class="badge bg-light text-dark">{{ contenido.capitulos }} eps.</span>
+                            {% elif contenido.tipo == 'pelicula' %}
+                                <span class="badge bg-light text-dark">{{ contenido.capitulos }} min.</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">{{ contenido.capitulos }} vol.</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-credit-card text-muted me-2"></i>
+                                <span>{{ contenido.suscripcion.nombre_plan }}</span>
+                            </div>
+                            <small class="text-muted">${{ contenido.suscripcion.precio }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <a href="{% url 'actualizar_contenido' contenido.id %}" class="btn btn-warning mb-1">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a href="{% url 'borrar_contenido' contenido.id %}" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Estadísticas Actualizadas -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ contenidos.count }}</h4>
+                                <p>Total Contenido</p>
+                            </div>
+                            <i class="bi bi-collection-play fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ anime_count }}</h4>
+                                <p>Animes</p>
+                            </div>
+                            <i class="bi bi-tv fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ peliculas_count }}</h4>
+                                <p>Películas</p>
+                            </div>
+                            <i class="bi bi-film fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ manga_count }}</h4>
+                                <p>Mangas</p>
+                            </div>
+                            <i class="bi bi-book fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-collection-play display-1 text-muted"></i>
+            </div>
+            <h3 class="text-muted">No hay contenido registrado</h3>
+            <p class="text-muted mb-4">Comienza agregando el primer contenido al sistema.</p>
+            <a href="{% url 'agregar_contenido' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-square"></i> Agregar Primer Contenido
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const table = document.getElementById('contenidosTable');
+    
+    if (table) {
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        function filterTable() {
+            const filter = searchInput.value.toLowerCase();
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(filter)) {
+                        found = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+        
+        searchInput.addEventListener('keyup', filterTable);
+        searchButton.addEventListener('click', filterTable);
+    }
+});
+</script>
+{% endblock %}
